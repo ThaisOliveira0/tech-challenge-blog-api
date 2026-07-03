@@ -1,58 +1,58 @@
-import User from '#models/user'
-import hash from '@adonisjs/core/services/hash'
-import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
+import { InvalidCredentialsException } from '#exceptions/invalid_credentials_exception'
+import { IUserRepository } from '#repositories/user/user_repository'
+import { HashService } from './hash_service.js'
 
 export default class AuthService {
-  /**
-   * REGISTER USER
-   */
+  constructor(
+    private users: IUserRepository,
+    private hash: HashService
+  ) {}
+
   async register(data: {
     name: string
     email: string
     password: string
     role: 'teacher' | 'student'
   }) {
-    // cria usuário
-    const user = await User.create({
-      name: data.name,
-      email: data.email,
-      password: await hash.make(data.password),
-      role: data.role,
+    const password = await this.hash.make(data.password)
+
+    const user = await this.users.create({
+      ...data,
+      password,
     })
 
-    // gera token automaticamente
-    const token = await User.accessTokens.create(user)
+    const token = await this.users.createToken(user)
 
     return {
       user,
-      token: token.value!.release(),
+      token,
     }
   }
 
-  /**
-   * LOGIN USER
-   */
-  async login(data: { email: string; password: string }) {
-    // busca usuário
-    const user = await User.findBy('email', data.email)
+  async login(data: {
+    email: string
+    password: string
+  }) {
+    const user = await this.users.findByEmail(data.email)
 
     if (!user) {
-      throw new Error('Invalid credentials')
+      throw new InvalidCredentialsException()
     }
 
-    // valida senha
-    const passwordValid = await hash.verify(user.password, data.password)
+    const valid = await this.hash.verify(
+      user.password,
+      data.password
+    )
 
-    if (!passwordValid) {
-      throw new Error('Invalid credentials')
+    if (!valid) {
+      throw new InvalidCredentialsException()
     }
 
-    // gera token
-    const token = await User.accessTokens.create(user)
+    const token = await this.users.createToken(user)
 
     return {
       user,
-      token: token.value!.release(),
+      token,
     }
   }
 }

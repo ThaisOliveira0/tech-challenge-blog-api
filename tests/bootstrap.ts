@@ -28,7 +28,9 @@ export const plugins: Config['plugins'] = [
   assert(),
   pluginAdonisJS(app),
   dbAssertions(app),
-  apiClient(),
+  apiClient({
+      baseURL: 'http://localhost:3333',
+    }),
   sessionApiClient(app),
   authApiClient(app),
 ]
