@@ -1,75 +1,34 @@
-import Post from '#models/post'
+import { CreatePostDTO } from '#dtos/create_post_dto'
+import { UpdatePostDTO } from '#dtos/update_post_dto'
+import { LucidPostRepository } from '#repositories/post/lucid_post_repository'
 
 export default class PostService {
-  /**
-   * CREATE POST
-   */
-  async create(data: {
-    title: string
-    content: string
-    userId: number
-  }) {
-    const post = await Post.create({
-      title: data.title,
-      content: data.content,
-      userId: data.userId,
-    })
+private repository = new LucidPostRepository()
 
-    return post
+  async create(data: CreatePostDTO) {
+    return this.repository.create(data)
   }
 
-  /**
-   * LIST ALL POSTS
-   */
   async list() {
-    return await Post.query().preload('user')
+    return this.repository.findAll()
   }
 
-  /**
-   * GET POST BY ID
-   */
   async findById(id: number) {
-    return await Post.query()
-      .where('id', id)
-      .preload('user')
-      .first()
+    return this.repository.findById(id)
   }
 
-  /**
-   * UPDATE POST
-   */
   async update(
     id: number,
-    data: {
-      title?: string
-      content?: string
-    }
+    data: UpdatePostDTO
   ) {
-    const post = await Post.findOrFail(id)
-
-    post.merge(data)
-
-    await post.save()
-
-    return post
+    return this.repository.update(id, data)
   }
 
-  /**
-   * DELETE POST
-   */
   async delete(id: number) {
-    const post = await Post.findOrFail(id)
-
-    await post.delete()
+    await this.repository.delete(id)
   }
 
-  /**
-   * SEARCH POSTS
-   */
   async search(term: string) {
-    return await Post.query()
-      .where('title', 'like', `%${term}%`)
-      .orWhere('content', 'like', `%${term}%`)
-      .preload('user')
+    return this.repository.search(term)
   }
 }

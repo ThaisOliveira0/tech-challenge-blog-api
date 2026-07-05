@@ -6,27 +6,14 @@ import { updatePostValidator } from '#validators/update_post_validator'
 export default class PostsController {
   private postService = new PostService()
 
-  /**
-   * LIST ALL POSTS
-   */
   async index({ response }: HttpContext) {
-    const posts = await this.postService.list()
-
-    return response.ok(posts)
+    return response.ok(await this.postService.list())
   }
 
-  /**
-   * GET POST BY ID
-   */
   async show({ params, response }: HttpContext) {
-    const post = await this.postService.findById(params.id)
-
-    return response.ok(post)
+    return response.ok(await this.postService.findById(params.id))
   }
 
-  /**
-   * CREATE POST
-   */
   async store({ request, auth, response }: HttpContext) {
     const payload = await request.validateUsing(createPostValidator)
 
@@ -38,9 +25,6 @@ export default class PostsController {
     return response.created(post)
   }
 
-  /**
-   * UPDATE POST
-   */
   async update({ params, request, response }: HttpContext) {
     const payload = await request.validateUsing(updatePostValidator)
 
@@ -49,23 +33,14 @@ export default class PostsController {
     return response.ok(post)
   }
 
-  /**
-   * DELETE POST
-   */
   async destroy({ params, response }: HttpContext) {
     await this.postService.delete(params.id)
-
     return response.noContent()
   }
 
-  /**
-   * SEARCH POSTS
-   */
   async search({ request, response }: HttpContext) {
     const term = request.input('q')
 
-    const posts = await this.postService.search(term)
-
-    return response.ok(posts)
+    return response.ok(await this.postService.search(term))
   }
 }
