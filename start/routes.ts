@@ -28,13 +28,14 @@ router.group(() => {
 /**
  * POSTS (protegido)
  */
-router.group(() => {
-  router.get('/', [PostsController, 'index'])
-  router.get('/:id', [PostsController, 'show'])
-  router.post('/', [PostsController, 'store'])
-  router.put('/:id', [PostsController, 'update'])
-  router.delete('/:id', [PostsController, 'destroy'])
-  router.get('/search', [PostsController, 'search'])
-})
-.prefix('/api/v1/posts')
-.use(middleware.auth())
+router
+  .group(() => {
+    router.get('/', [PostsController, 'index'])
+    router.get('/search', [PostsController, 'search'])
+    router.get('/:id', [PostsController, 'show'])
+    router.post('/', [PostsController, 'store'])
+    router.put('/:id', [PostsController, 'update'])
+    router.delete('/:id', [PostsController, 'destroy'])
+  })
+  .prefix('/api/v1/posts')
+  .use(middleware.auth())
