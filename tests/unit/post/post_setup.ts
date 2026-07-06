@@ -1,6 +1,5 @@
 import Post from '#models/post'
 import User from '#models/user'
-import db from '@adonisjs/lucid/services/db'
 
 type LoginResponse = {
   message: string

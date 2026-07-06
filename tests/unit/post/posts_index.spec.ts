@@ -2,14 +2,14 @@ import { test } from '@japa/runner'
 import Post from '#models/post'
 import { cleanPosts, registerAndLogin } from './post_setup.ts'
 
-type Post = {
+type PostResponseItem = {
   id: number
   title: string
   content: string
   userId: number
 }
 
-type PostResponse = Post[]
+type PostResponse = PostResponseItem[]
 
 test.group('POSTS - INDEX', (group) => {
   group.each.setup(cleanPosts)
