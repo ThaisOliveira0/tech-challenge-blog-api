@@ -44,7 +44,7 @@ test.group('AUTH - LOGIN', () => {
     assert.isNotEmpty(body.data.token)
   })
 
-  test('should return 401 when password is invalid', async ({ client, assert }) => {
+  test('should return 401 when password is invalid', async ({ client}) => {
     const hash = new AdonisHashService()
 
     const email = `user${Date.now()}@email.com`
