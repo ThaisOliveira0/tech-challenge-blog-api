@@ -1,13 +1,22 @@
 import Post from '#models/post'
 import User from '#models/user'
+import db from '@adonisjs/lucid/services/db'
 
 type LoginResponse = {
-  user: {
-    id: number
-    email: string
+  message: string
+  data: {
+    user: {
+      id: number
+      name: string
+      email: string
+      role: string
+      createdAt: string
+      updatedAt: string
+    }
+    token: string
   }
-  token: string
 }
+
 
 export async function registerAndLogin(client: any) {
   const email = `user${Date.now()}@email.com`
@@ -29,8 +38,8 @@ export async function registerAndLogin(client: any) {
   const body = response.body() as LoginResponse
 
   return {
-    token: body.token,
-    userId: body.user.id,
+    token: body.data.token,
+    userId: body.data.user.id,
     email,
   }
 }

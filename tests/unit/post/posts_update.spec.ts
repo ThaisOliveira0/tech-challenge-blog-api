@@ -2,13 +2,16 @@ import { test } from '@japa/runner'
 import Post from '#models/post'
 import { cleanPosts, registerAndLogin } from './post_setup.ts'
 
-type PostResponse = {
-  id: number
-  title: string
-  content: string
-  userId: number
-  createdAt: string
-  updatedAt: string
+type UpdatePostResponse = {
+  message: string
+  data: {
+    id: number
+    title: string
+    content: string
+    userId: number
+    createdAt: string
+    updatedAt: string
+  }
 }
 
 test.group('POSTS - UPDATE', (group) => {
@@ -33,15 +36,17 @@ test.group('POSTS - UPDATE', (group) => {
 
     response.assertStatus(200)
 
-    const body = response.body() as PostResponse
+    const body = response.body() as UpdatePostResponse
 
-    assert.equal(body.id, post.id)
-    assert.equal(body.title, 'Título Atualizado')
+    assert.equal(body.message, 'Post updated successfully.')
+
+    assert.equal(body.data.id, post.id)
+    assert.equal(body.data.title, 'Título Atualizado')
     assert.equal(
-      body.content,
+      body.data.content,
       'Conteúdo atualizado com mais de dez caracteres.'
     )
-    assert.equal(body.userId, auth.userId)
+    assert.equal(body.data.userId, auth.userId)
 
     await post.refresh()
 
@@ -70,6 +75,11 @@ test.group('POSTS - UPDATE', (group) => {
 
     response.assertStatus(200)
 
+    const body = response.body() as UpdatePostResponse
+
+    assert.equal(body.message, 'Post updated successfully.')
+    assert.equal(body.data.title, 'Novo Título')
+
     await post.refresh()
 
     assert.equal(post.title, 'Novo Título')
@@ -90,6 +100,10 @@ test.group('POSTS - UPDATE', (group) => {
       })
 
     response.assertStatus(404)
+
+    response.assertBodyContains({
+      message: 'Post not found.',
+    })
   })
 
   test('should return 422 when title is invalid', async ({ client }) => {
