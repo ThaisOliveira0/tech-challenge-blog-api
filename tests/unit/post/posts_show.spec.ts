@@ -21,6 +21,7 @@ test.group('POSTS - SHOW', (group) => {
     response.assertStatus(200)
 
     const body = response.body()
+    console.log(body)
 
     assert.equal(body.id, post.id)
     assert.equal(body.title, 'Meu Post')

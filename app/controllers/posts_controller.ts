@@ -78,29 +78,27 @@ export default class PostsController {
     }
   }
 
-  async destroy({ params, auth, response }: HttpContext) {
-    try {
-      await this.postService.delete(params.id, auth.user!)
+async destroy({ params, auth, response }: HttpContext) {
+  try {
+    await this.postService.delete(params.id, auth.user!)
 
-      return response.ok({
-        message: 'Post deleted successfully.',
+    return response.noContent()
+  } catch (error) {
+    if (error instanceof UnauthorizedPostActionException) {
+      return response.forbidden({
+        message: error.message,
       })
-    } catch (error) {
-      if (error instanceof UnauthorizedPostActionException) {
-        return response.forbidden({
-          message: error.message,
-        })
-      }
-
-      if (error instanceof PostNotFoundException) {
-        return response.notFound({
-          message: error.message,
-        })
-      }
-
-      throw error
     }
+
+    if (error instanceof PostNotFoundException) {
+      return response.notFound({
+        message: error.message,
+      })
+    }
+
+    throw error
   }
+}
 
   async search({ request, response }: HttpContext) {
     const term = request.input('q')

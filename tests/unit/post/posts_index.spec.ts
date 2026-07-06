@@ -2,9 +2,17 @@ import { test } from '@japa/runner'
 import Post from '#models/post'
 import { cleanPosts, registerAndLogin } from './post_setup.ts'
 
+type Post = {
+  id: number
+  title: string
+  content: string
+  userId: number
+}
+
+type PostResponse = Post[]
+
 test.group('POSTS - INDEX', (group) => {
   group.each.setup(cleanPosts)
-
 
   test('should return all posts', async ({ client, assert }) => {
     const auth = await registerAndLogin(client)
@@ -28,14 +36,13 @@ test.group('POSTS - INDEX', (group) => {
 
     response.assertStatus(200)
 
-    const body = response.body() as any[]
+    const body = response.body() as PostResponse
 
     assert.lengthOf(body, 2)
 
     assert.equal(body[0].title, 'Post 1')
     assert.equal(body[1].title, 'Post 2')
   })
-
 
   test('should return empty list', async ({ client, assert }) => {
     const auth = await registerAndLogin(client)
@@ -46,12 +53,11 @@ test.group('POSTS - INDEX', (group) => {
 
     response.assertStatus(200)
 
-    const body = response.body() as any[]
+    const body = response.body() as PostResponse
 
     assert.isArray(body)
     assert.lengthOf(body, 0)
   })
-
 
   test('should return 401 without token', async ({ client }) => {
     const response = await client.get('/api/v1/posts')

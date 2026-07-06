@@ -3,22 +3,30 @@ import User from '#models/user'
 import { AdonisHashService } from '#services/adonis_hash_service'
 
 type LoginResponse = {
-  user: {
-    email: string
+  message: string
+  data: {
+    user: {
+      id: number
+      name: string
+      email: string
+      role: string
+      createdAt: string
+      updatedAt: string
+    }
+    token: string
   }
-  token: string
 }
 
 test.group('AUTH - LOGIN', () => {
   test('should login successfully', async ({ client, assert }) => {
     const hash = new AdonisHashService()
 
-    const email = 'user1@email.com'
+    const email = `user${Date.now()}@email.com`
 
     await User.create({
       name: 'User1',
-      email: 'user1@email.com',
-      password: await hash.make('123456'), 
+      email,
+      password: await hash.make('123456'),
       role: 'teacher',
     })
 
@@ -31,15 +39,15 @@ test.group('AUTH - LOGIN', () => {
 
     const body = response.body() as LoginResponse
 
-    assert.equal(body.user.email, email)
-    assert.isString(body.token)
-    assert.isNotEmpty(body.token)
+    assert.equal(body.data.user.email, email)
+    assert.isString(body.data.token)
+    assert.isNotEmpty(body.data.token)
   })
 
-  test('should return 401 when password is invalid', async ({ client }) => {
+  test('should return 401 when password is invalid', async ({ client, assert }) => {
     const hash = new AdonisHashService()
 
-    const email = 'user2@email.com'
+    const email = `user${Date.now()}@email.com`
 
     await User.create({
       name: 'User2',
