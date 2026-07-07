@@ -6,11 +6,5 @@ until node -e "const net = require('net'); const socket = new net.Socket(); sock
   sleep 2
 done
 
-echo "MySQL is ready. Running migrations..."
-node ace migration:run
-
-echo "Running seeders..."
-node ace db:seed
-
 echo "Starting Adonis server..."
 exec "$@"
